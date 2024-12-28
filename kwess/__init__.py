@@ -223,7 +223,7 @@ class Trader:
             
 
     @get_all
-    def get_account_activities(self, startdatetime, enddatetime=None, accounttype="TFSA", verbose=''):
+    def get_account_activities(self, startdatetime, enddatetime=None, accountnumber=None, accounttype="TFSA", verbose=''):
         """ Description:
                 Generator that returns the account activities from the account related to account
                 type accounttype, 
@@ -240,7 +240,8 @@ class Trader:
                 The account activities as a Python object representation of the returned json,
                 between the range startdatetime and enddatetime, in chunks of 30 days.
         """
-        accountnumber = self.find_account_number(accounttype)
+        if accountnumber == None:
+            accountnumber = self.find_account_number(accounttype)
         if accountnumber == None:
             self._report_and_exit(f"Nonexistent {accounttype} account.")
             
@@ -364,17 +365,18 @@ class Trader:
 
 
     @get_all
-    def get_account_orders(self, startdatetime, enddatetime=None, accounttype="TFSA", statefilter="All", verbose=''):
+    def get_account_orders(self, startdatetime, enddatetime=None, accountnumber=None, accounttype="TFSA", statefilter="All", verbose=''):
         """
         Description:
             Generator that provides the account orders from the account related to account type
-            accounttype, 
+            accounttype, or a specific account (accountnumber)
             between the range specified by startdatetime and enddatetime. Both objects are
             datetime objects.
         Parameters:
             - startdatetime datetime object representing the beginning of a range.
             - enddatetime optional datetime object representing the end of a range.
             Defaults to now (datetime.datetime.now()) if not specified.
+            - accountnumber is a string of the account ID, if supplied overrides accounttype
             - accounttype type of Questrade account. Defaults to "tfsa".
             - statefilter can be used to specify the state of orders.
             It has 3 possible values: Opened, Closed, or All. Defaults to "All".
@@ -384,7 +386,8 @@ class Trader:
             Account orders as a Python object representation of the returned json,
             between the range startdatetime and enddatetime, in chunks of 30 days.
         """
-        accountnumber = self.find_account_number(accounttype)
+        if accountnumber == None:
+            accountnumber = self.find_account_number(accounttype)
         if accountnumber == None:
             self._report_and_exit(f"Nonexistent {accounttype} account.")
 
@@ -398,7 +401,7 @@ class Trader:
             statefilter = "Open"
         elif statefilter.lower().startswith("c"):
             statefilter = "Closed"
-        else:
+        elif statefilter.lower() == "all" # allow other state filters
             statefilter = "All"
         if verbosity > 2:
             print("/".join([self.api_server, cmd_class, accountnumber, 'orders']))
@@ -454,7 +457,7 @@ class Trader:
     
 
     @get_all
-    def get_account_executions(self, startdatetime, enddatetime=None, accounttype="TFSA", verbose=''):
+    def get_account_executions(self, startdatetime, enddatetime=None, accountnumber=None, accounttype="TFSA", verbose=''):
         """
         Description:
             Generator that provides account executions from the account related to account type
@@ -472,7 +475,8 @@ class Trader:
             Account executions as a Python object representation of the returned json,
             between the range startdatetime and enddatetime, in chunks of 30 days.
         """
-        accountnumber = self.find_account_number(accounttype)
+        if accountnumber == None:
+            accountnumber = self.find_account_number(accounttype)
         if accountnumber == None:
             self._report_and_exit(f"Nonexistent {accounttype} account.")
 
@@ -498,7 +502,7 @@ class Trader:
         return resp.json()
 
 
-    def get_account_balances(self, accounttype="TFSA", verbose=''):
+    def get_account_balances(self, accountnumber=None, accounttype="TFSA", verbose=''):
         """
         Definition:
             Provides the account balances for the account related to account type accounttype.
@@ -509,7 +513,8 @@ class Trader:
         Returns:
             Account balances as a Python object representation of the returned json.
         """
-        accountnumber = self.find_account_number(accounttype)
+        if accountnumber == None:
+            accountnumber = self.find_account_number(accounttype)
         if accountnumber == None:
             self._report_and_exit(f"Nonexistent {accounttype} account.")
             
@@ -529,7 +534,7 @@ class Trader:
         return resp.json()
 
 
-    def get_account_positions(self, accounttype="TFSA", verbose=''):
+    def get_account_positions(self, accountnumber=None, accounttype="TFSA", verbose=''):
         """
         Definition:
             Provides the account positions for the account related to account type accounttype.
@@ -540,7 +545,8 @@ class Trader:
         Returns:
             Account positions as a Python object representation of the returned json.
         """
-        accountnumber = self.find_account_number(accounttype)
+        if accountnumber == None:
+            accountnumber = self.find_account_number(accounttype)
         if accountnumber == None:
             self._report_and_exit(f"Nonexistent {accounttype} account.")
             
